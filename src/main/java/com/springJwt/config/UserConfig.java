@@ -2,6 +2,7 @@ package com.springJwt.config;
 
 
 import com.springJwt.repository.UserRepository;
+import com.springJwt.serviceImpl.UserDetailsServiceImpl;
 import com.springJwt.serviceImpl.UserServiceImpl;
 import org.apache.catalina.User;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,36 +43,41 @@ public class UserConfig {
         return authenticationConfiguration.getAuthenticationManager();
     }
 
+    // convert this to interface implementation
 
-    @Autowired
-    public UserRepository userRepository;
+    //    @Autowired
+    //    public UserRepository userRepository;
+    //
+    //    @Bean
+    //    public UserDetailsService userDetailsService(){
+    //        return username -> (UserDetails) userRepository.findByNameOrEmail(username,username).orElse(null);
+    //    }
+
+
 
 //    @Bean
-//    public UserDetailsService userDetailsService(){
-//        return username -> (UserDetails) userRepository.findByNameOrEmail(username,username).orElse(null);
+//    public UserDetailsService userDetailsService() {
+//        Consumer<String> usernamePrinter = username -> System.out.println("Username: " + username);
+//        return username -> {
+//            usernamePrinter.accept(username);  // Print username for debugging
+//            return userRepository.findByNameOrEmail(username, username).orElse(null);
+//        };
 //    }
 
 
-
-
-
-    @Bean
-    public UserDetailsService userDetailsService() {
-        Consumer<String> usernamePrinter = username -> System.out.println("Username: " + username);
-        return username -> {
-            usernamePrinter.accept(username);  // Print username for debugging
-            return userRepository.findByNameOrEmail(username, username).orElse(null);
-        };
-    }
-
+    @Autowired
+    private UserDetailsServiceImpl userDetailsServiceImpl;
 
     @Bean
     AuthenticationProvider authenticationProvider(){
         DaoAuthenticationProvider daoAuthenticationProvider=new DaoAuthenticationProvider();
-        daoAuthenticationProvider.setUserDetailsService(userDetailsService());
+        daoAuthenticationProvider.setUserDetailsService(userDetailsServiceImpl);
         daoAuthenticationProvider.setPasswordEncoder(passwordEncoder());
         return daoAuthenticationProvider;
     }
+
+
+
 
 
 
