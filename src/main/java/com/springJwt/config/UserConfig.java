@@ -2,6 +2,7 @@ package com.springJwt.config;
 
 
 import com.springJwt.repository.UserRepository;
+import com.springJwt.serviceImpl.UserServiceImpl;
 import org.apache.catalina.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -11,10 +12,13 @@ import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+
+import java.util.function.Consumer;
 
 @Configuration
 public class UserConfig {
@@ -42,10 +46,24 @@ public class UserConfig {
     @Autowired
     public UserRepository userRepository;
 
+//    @Bean
+//    public UserDetailsService userDetailsService(){
+//        return username -> (UserDetails) userRepository.findByNameOrEmail(username,username).orElse(null);
+//    }
+
+
+
+
+
     @Bean
-    public UserDetailsService userDetailsService(){
-        return username -> userRepository.findByEmail(username).orElse(null);
+    public UserDetailsService userDetailsService() {
+        Consumer<String> usernamePrinter = username -> System.out.println("Username: " + username);
+        return username -> {
+            usernamePrinter.accept(username);  // Print username for debugging
+            return userRepository.findByNameOrEmail(username, username).orElse(null);
+        };
     }
+
 
     @Bean
     AuthenticationProvider authenticationProvider(){
@@ -54,6 +72,7 @@ public class UserConfig {
         daoAuthenticationProvider.setPasswordEncoder(passwordEncoder());
         return daoAuthenticationProvider;
     }
+
 
 
 }
